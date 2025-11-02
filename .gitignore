@@ -2,6 +2,12 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .env
+.venv/
+venv/
+.coverage
+htmlcov/
+.DS_Store
+*.egg-info/
 *.tfstate
 *.tfstate.backup
 .terraform/
