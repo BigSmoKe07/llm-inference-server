@@ -45,14 +45,20 @@ def process_message(classifier, message: dict) -> None:
         inference_latency_seconds.observe(time.perf_counter() - start)
         logger.info("job=%s label=%s score=%.4f", job_id, result["label"], result["score"])
     except Exception:
-        update_job_failed(job_id)
+        try:
+            update_job_failed(job_id)
+        except Exception as store_err:
+            logger.error("Failed to mark job %s as failed: %s", job_id, store_err, exc_info=True)
         inference_requests_total.labels(status="failed").inc()
         logger.exception("job=%s failed", job_id)
         raise  # Let message return to queue; SQS retries up to maxReceiveCount
 
 
 def run() -> None:
-    start_metrics_server()
+    try:
+        start_metrics_server()
+    except OSError as e:
+        logger.warning("Could not start metrics server on port 9090: %s", e)
     classifier = SentimentClassifier()
     sqs = _sqs()
     logger.info("Worker ready — polling %s", QUEUE_URL)
@@ -61,7 +67,7 @@ def run() -> None:
         try:
             inference_queue_depth.set(_queue_depth(sqs))
         except Exception:
-            pass  # Don't crash the worker if depth check fails
+            logger.warning("Failed to update queue depth metric", exc_info=True)
 
         response = sqs.receive_message(
             QueueUrl=QUEUE_URL,
@@ -77,7 +83,7 @@ def run() -> None:
                     ReceiptHandle=message["ReceiptHandle"],
                 )
             except Exception:
-                pass  # Message becomes visible again after VisibilityTimeout
+                logger.warning("Message processing exception, will become visible for retry", exc_info=True)
 
 
 if __name__ == "__main__":
