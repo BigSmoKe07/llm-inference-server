@@ -267,6 +267,12 @@ resource "aws_ecs_service" "api" {
 
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
+
+  depends_on = [
+    aws_iam_role_policy_attachment.execution_managed,
+    aws_iam_role_policy.execution_secrets,
+    aws_iam_role_policy.api_task_policy,
+  ]
 }
 
 resource "aws_ecs_service" "worker" {
@@ -285,4 +291,10 @@ resource "aws_ecs_service" "worker" {
   lifecycle {
     ignore_changes = [desired_count]  # Managed by autoscaling
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.execution_managed,
+    aws_iam_role_policy.execution_secrets,
+    aws_iam_role_policy.worker_task_policy,
+  ]
 }
