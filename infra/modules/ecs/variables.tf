@@ -1,0 +1,14 @@
+variable "prefix"                   { type = string }
+variable "vpc_id"                   { type = string }
+variable "private_subnet_ids"       { type = list(string) }
+variable "alb_sg_id"                { type = string }
+variable "target_group_arn"         { type = string }
+variable "api_image"                { type = string }
+variable "worker_image"             { type = string }
+variable "sqs_queue_url"            { type = string }
+variable "dynamodb_table_name"      { type = string }
+variable "api_key_secret_arn"       { type = string }
+variable "aws_region"               { type = string }
+variable "grafana_remote_write_url" { type = string }
+variable "grafana_username"         { type = string }
+variable "grafana_api_key_secret_arn" { type = string }
