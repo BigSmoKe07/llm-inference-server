@@ -1,0 +1,18 @@
+// Grafana Alloy config — Worker sidecar
+// Scrapes worker Prometheus HTTP server on localhost:9090 and remote_writes to Grafana Cloud.
+
+prometheus.scrape "worker" {
+  targets        = [{"__address__" = "localhost:9090"}]
+  forward_to     = [prometheus.remote_write.grafana_cloud.receiver]
+  scrape_interval = "15s"
+}
+
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = env("GRAFANA_REMOTE_WRITE_URL")
+    basic_auth {
+      username = env("GRAFANA_USERNAME")
+      password = env("GRAFANA_API_KEY")
+    }
+  }
+}

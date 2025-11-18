@@ -1,0 +1,19 @@
+// Grafana Alloy config — API sidecar
+// Scrapes FastAPI /metrics on localhost:8000 and remote_writes to Grafana Cloud.
+
+prometheus.scrape "api" {
+  targets = [{"__address__" = "localhost:8000"}]
+  forward_to     = [prometheus.remote_write.grafana_cloud.receiver]
+  metrics_path   = "/metrics"
+  scrape_interval = "15s"
+}
+
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = env("GRAFANA_REMOTE_WRITE_URL")
+    basic_auth {
+      username = env("GRAFANA_USERNAME")
+      password = env("GRAFANA_API_KEY")
+    }
+  }
+}
