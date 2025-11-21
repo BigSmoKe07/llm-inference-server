@@ -4,6 +4,7 @@ import os
 
 
 def _client():
+    # Created per-call so tests can patch boto3 without module-level side effects
     return boto3.client("sqs", endpoint_url=os.getenv("SQS_ENDPOINT_URL"))
 
 

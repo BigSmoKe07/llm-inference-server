@@ -71,9 +71,9 @@ def run() -> None:
 
         response = sqs.receive_message(
             QueueUrl=QUEUE_URL,
-            MaxNumberOfMessages=1,
-            WaitTimeSeconds=20,
-            VisibilityTimeout=30,
+            MaxNumberOfMessages=1,   # one at a time — inference is slow, no benefit batching here
+            WaitTimeSeconds=20,      # long polling: blocks up to 20s, reduces empty-receive costs
+            VisibilityTimeout=30,    # 30s to finish inference before message reappears for retry
         )
         for message in response.get("Messages", []):
             try:

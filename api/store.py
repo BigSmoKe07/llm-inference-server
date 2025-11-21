@@ -5,6 +5,7 @@ from typing import Optional
 
 
 def _table():
+    # Created per-call so tests can patch boto3 without module-level side effects
     dynamo = boto3.resource("dynamodb", endpoint_url=os.getenv("DYNAMODB_ENDPOINT_URL"))
     return dynamo.Table(os.environ["DYNAMODB_TABLE"])
 

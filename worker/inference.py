@@ -19,5 +19,6 @@ class SentimentClassifier:
         model_load_seconds.set(time.perf_counter() - start)
 
     def predict(self, text: str) -> dict:
+        # distilbert has a 512 token limit; truncate to 512 chars as a safe proxy
         result = self._pipeline(text[:512])[0]
         return {"label": result["label"], "score": float(result["score"])}

@@ -14,6 +14,7 @@ from api.models import PredictRequest, PredictResponse, ResultResponse
 from api.queue import enqueue_job
 from api.store import get_job, put_job
 
+
 def _parse_score(raw):  # -> float | None (3.10+ syntax; using implicit for 3.9 compat)
     """Convert DynamoDB score (stored as string) to float, returning None on failure."""
     if raw is None:
@@ -61,6 +62,7 @@ async def predict(
 ):
     job_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
+    # Write to DB first — worker must find the job record before it processes the message
     put_job(job_id, request.text, now)
     enqueue_job(job_id, request.text, now)
     return PredictResponse(job_id=job_id)
